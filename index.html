@@ -32,8 +32,8 @@
 
         <div class="page active" id="page0">
             <h2>Tell us about yourself</h2>
-            <label>Name:<br/><input type="text" id="userName" /></label><br/><br/>
             <label><strong>Company (required):</strong><br/><input type="text" id="userCompany" required /></label><br/><br/>
+            <label>Name:<br/><input type="text" id="userName" /></label><br/><br/>
             <label>Comments:<br/><textarea id="userComments" rows="4" style="width:100%;"></textarea></label><br/><br/>
             <button onclick="validatePage0()">Next</button>
         </div>
@@ -41,6 +41,8 @@
 
         <div class="page" id="page1">
             <h2>When considering a Hull maintenance solution:</h2>
+            <div style="margin-top: 5px;font-size: 12px;">0 - Not important at all</div>
+            <div style="margin-top: 5px;font-size: 12px;">5 - Very important</div>
             <div id="questions"></div>
             <button onclick="validatePage1()">Next</button>
         </div>
@@ -67,12 +69,12 @@
             </div>
             <div class="legend">
                 <strong>Legend:</strong><br/>
-                1 - Hullbot proactive robot cleaning solution<br/>
-                2 - Preventative cleaning with divers<br/>
-                3 - Antifoul coating only<br/>
-                4 - Business as usual<br/>
+                1 - Hullbot proactive grooming with robot systems<br/>
+                2 - Reactive cleaning with divers (e.g. quarterly)<br/>
+                3 - Antifouling only<br/>
+                4 - Business as usual (option 2 and 3 combined)<br/>
                 5 - Other reactive cleaning robot solutions<br/>
-                6 - Other proactive cleaning robot solutions
+                6 - Other proactive cleaning robot solutions (more than quarterly)
             </div>
             <button onclick="submitSurvey()">Submit</button>
         </div>
@@ -84,14 +86,14 @@
 
         <script>
             const questions = [
-                'How important is operational cost as a factor?',
-                'How important is on-going reliability of solution/service?',
-                'How important is its impact on unexpected downtime?',
-                'How important is global significance of solution?',
-                'How important is future proofing of the solution?',
-                'How important is the solution providers mission?',
-                'How important is the carbon sequestration impact of the solution?',
-                'How important are the environment and ecological benefits of the solution?'
+                'When selecting hull maintenance solutions in general, how important is operational cost?',
+                'How important is ensuring the new solution doesn\'t cause extra downtime?',
+                'How important is ensuring the new solution reduces unexpected downtimes?',
+                'How important is partnering with a proven global solution provider?',
+                'How important is it that the solution not only be effective today but also meet the needs of the future?',
+                'How important is ensuring that the suppliers mission statement aligns with your values?',
+                'How important is emissions reduction of the new solution?',
+                'How important are the environment and ecological benefits of the new solution?'
             ];
 
             const image = new Image(600, 600);
