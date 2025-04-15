@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hull Maintenance Survey</title>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     .page { display: none; }
@@ -19,7 +20,7 @@
     .legend { margin-top: 20px; }
   </style>
 </head>
-<body>
+<body onload="emailjs.init('tkFv2CBCElWz9rv5c')">
 
   <div class="page active" id="page1">
     <h2>When considering a Hull maintenance solution:</h2>
@@ -42,7 +43,7 @@
       <canvas id="xyCanvas" width="600" height="600"></canvas>
       <div id="xAxisTitle" style="text-align:center;margin-top:-35px;"></div>
     </div>
-    
+
 
     <div class="legend">
       <strong>Legend:</strong>
@@ -75,6 +76,7 @@
     image.src = "./canvas_image.png";
 
     const questionContainer = document.getElementById('questions');
+    let graphCoords = {};
 
     questions.forEach((q, i) => {
       const group = document.createElement('div');
@@ -126,17 +128,13 @@
       document.getElementById('xAxisTitle').innerText = topTwo[0];
       document.getElementById('yAxisTitle').innerText = topTwo[1];
 
-
-
       const canvas = document.getElementById('xyCanvas');
       const ctx = canvas.getContext('2d');
       ctx.drawImage(image, 0, 0);
 
-      const solutions = [
-        '1', '2', '3', '4', '5', '6'
-      ];
-
+      const solutions = ['1', '2', '3', '4', '5', '6'];
       let placed = {};
+      graphCoords = placed;
       let dragTarget = null;
 
       canvas.onclick = (e) => {
@@ -181,9 +179,7 @@
         drawPoints();
       };
 
-      canvas.onmouseup = () => {
-        dragTarget = null;
-      }
+      canvas.onmouseup = () => dragTarget = null;
     }
 
     function submitSurvey() {
@@ -193,13 +189,21 @@
       });
 
       const aspects = document.getElementById('aspects').value;
-      const canvas = document.getElementById('xyCanvas');
-      const imgData = canvas.toDataURL();
+      const coords = Object.entries(graphCoords).map(([k, v]) => `Option ${k}: (x: ${Math.round(v.x)}, y: ${Math.round(v.y)})`).join('\n');
 
-      const body = `Answers:%0D%0A${answers.join('%0D%0A')}%0D%0A%0D%0AAspects:%0D%0A${aspects}%0D%0AGraph Screenshot (manual): ${imgData}`;
-      window.location.href = `mailto:afridi_101@live.com?subject=Hull Maintenance Survey&body=${body}`;
+      const templateParams = {
+        answers: answers.join('\n'),
+        aspects,
+        coords
+      };
+
+      emailjs.send('hullbot_marketing', 'template_cbzrg1q', templateParams)
+        .then(function(response) {
+          alert('Survey submitted successfully!');
+        }, function(error) {
+          alert('Failed to send survey. Error: ' + JSON.stringify(error));
+        });
     }
-
   </script>
 </body>
 </html>
