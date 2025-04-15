@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hull Maintenance Survey</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .page { display: none; }
+    .active { display: block; }
+    .question-group { margin-bottom: 20px; }
+    .rating { display: flex; gap: 10px; }
+    .rating label { cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; }
+    .selected { background-color: #007bff; color: white; }
+    textarea { width: 100%; height: 150px; }
+    canvas { border: 1px solid black; margin-top: 10px; }
+    .number { position: absolute; width: 24px; height: 24px; text-align: center; line-height: 24px; background: #007bff; color: white; border-radius: 50%; cursor: move; }
+  </style>
+</head>
+<body>
+
+  <div class="page active" id="page1">
+    <h2>When considering a Hull maintenance solution</h2>
+    <div id="questions"></div>
+    <button onclick="nextPage(1)">Next</button>
+  </div>
+
+  <div class="page" id="page2">
+    <h2>Please list the aspects that matter to you the most</h2>
+    <textarea id="aspects"></textarea>
+    <button onclick="nextPage(2)">Next</button>
+  </div>
+
+  <div class="page" id="page3">
+    <h2>Place each solution on the graph</h2>
+    <p>Axes will be: <span id="axisLabels"></span></p>
+    <canvas id="xyCanvas" width="600" height="600"></canvas>
+    <button onclick="submitSurvey()">Submit</button>
+  </div>
+
+  <script>
+    const questions = [
+      'How important is operational cost as a factor?',
+      'How important is on-going reliability of solution/service?',
+      'How important is its impact on unexpected downtime?',
+      'How important is global significance of solution?',
+      'How important is future proofing of the solution?',
+      'How important is the solution providers mission?',
+      'How important is the carbon sequestration impact of the solution?',
+      'How important are the environment and ecological benefits of the solution?'
+    ];
+
+    const questionContainer = document.getElementById('questions');
+
+    questions.forEach((q, i) => {
+      const group = document.createElement('div');
+      group.className = 'question-group';
+      group.innerHTML = `<p>${q}</p>`;
+      const ratingDiv = document.createElement('div');
+      ratingDiv.className = 'rating';
+      for (let j = 0; j <= 5; j++) {
+        const label = document.createElement('label');
+        label.innerText = j;
+        label.onclick = () => {
+          Array.from(ratingDiv.children).forEach(c => c.classList.remove('selected'));
+          label.classList.add('selected');
+        };
+        ratingDiv.appendChild(label);
+      }
+      group.appendChild(ratingDiv);
+      questionContainer.appendChild(group);
+    });
+
+    function nextPage(current) {
+      document.getElementById(`page${current}`).classList.remove('active');
+      document.getElementById(`page${current + 1}`).classList.add('active');
+      if (current === 2) setUpGraph();
+    }
+
+    function setUpGraph() {
+      const aspects = document.getElementById('aspects').value.split('\n').map(x => x.trim()).filter(x => x);
+      const topTwo = aspects.slice(0, 2);
+      document.getElementById('axisLabels').innerText = `${topTwo[0]} (X) vs ${topTwo[1]} (Y)`;
+
+      const canvas = document.getElementById('xyCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const solutions = [
+        '1', '2', '3', '4', '5', '6'
+      ];
+
+      let placed = {};
+      let dragTarget = null;
+
+      canvas.onclick = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const next = solutions.find(s => !placed[s]);
+        if (next) {
+          placed[next] = { x, y };
+          drawPoints();
+        }
+      };
+
+      function drawPoints() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        Object.entries(placed).forEach(([label, pos]) => {
+          ctx.beginPath();
+          ctx.arc(pos.x, pos.y, 12, 0, 2 * Math.PI);
+          ctx.fillStyle = '#007bff';
+          ctx.fill();
+          ctx.fillStyle = 'white';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(label, pos.x, pos.y);
+        });
+      }
+
+      canvas.onmousedown = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        dragTarget = Object.entries(placed).find(([_, pos]) => Math.hypot(pos.x - x, pos.y - y) < 12);
+      };
+
+      canvas.onmousemove = (e) => {
+        if (!dragTarget) return;
+        const rect = canvas.getBoundingClientRect();
+        dragTarget[1].x = e.clientX - rect.left;
+        dragTarget[1].y = e.clientY - rect.top;
+        drawPoints();
+      };
+
+      canvas.onmouseup = () => dragTarget = null;
+    }
+
+    function submitSurvey() {
+      const answers = Array.from(document.querySelectorAll('.question-group')).map((group, i) => {
+        const selected = group.querySelector('.selected');
+        return `${questions[i]}: ${selected ? selected.innerText : 'N/A'}`;
+      });
+
+      const aspects = document.getElementById('aspects').value;
+      const canvas = document.getElementById('xyCanvas');
+      const imgData = canvas.toDataURL();
+
+      const body = `Answers:%0D%0A${answers.join('%0D%0A')}%0D%0A%0D%0AAspects:%0D%0A${aspects}%0D%0AGraph Screenshot (manual): ${imgData}`;
+      window.location.href = `mailto:youremail@example.com?subject=Hull Maintenance Survey&body=${body}`;
+    }
+  </script>
+</body>
+</html>
