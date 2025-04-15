@@ -67,6 +67,7 @@
                 <canvas id="xyCanvas" width="600" height="600"></canvas>
                 <div class="axis-label-x" id="xLabel"></div>
             </div>
+            <button onclick="resetGraph()" style="margin-top: 10px;">Reset Graph</button>
             <div class="legend">
                 <strong>Legend:</strong><br/>
                 1 - Hullbot proactive grooming with robot systems<br/>
@@ -93,7 +94,7 @@
                 'How important is it that the solution remains effective and compliant with future regulations and operational demands?',
                 'How important is the alignment between the suppliers mission statement and your values?',
                 'How important is it that the solution contributes to reducing carbon emissions?',
-                'How important is the solution’s positive impact on the environment and marine ecosystems??'
+                'How important is the solution’s positive impact on the environment and marine ecosystems?'
             ];
 
             const image = new Image(600, 600);
@@ -227,6 +228,17 @@
 
                 canvas.onmouseup = () => dragTarget = null;
             }
+
+            function resetGraph() {
+                if (confirm("Are you sure you want to reset all placements on the graph?")) {
+                    placed = {};
+                    const canvas = document.getElementById('xyCanvas');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(image, 0, 0);
+                }
+            }
+
 
             function submitSurvey() {
                 const name = document.getElementById('userName').value.trim();
