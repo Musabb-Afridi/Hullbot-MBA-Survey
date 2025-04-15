@@ -15,7 +15,7 @@
     textarea { width: 100%; height: 150px; }
     canvas { border: 1px solid black; margin-top: 10px; }
     .number { position: absolute; width: 24px; height: 24px; text-align: center; line-height: 24px; background: #007bff; color: white; border-radius: 50%; cursor: move; }
-    .y-axis-label { transform: rotate(-90deg); transform-origin: left top 0; position: absolute; left: 10px; top: 300px; }
+    .y-axis-label { transform: rotate(-90deg); transform-origin: left top 0; position: absolute; left: 20px; top: 300px; }
     .legend { margin-top: 20px; }
   </style>
 </head>
@@ -40,8 +40,9 @@
     <div style="position: relative; display: inline-block;">
       <div class="y-axis-label" id="yAxisTitle"></div>
       <canvas id="xyCanvas" width="600" height="600"></canvas>
+      <div id="xAxisTitle" style="text-align:center;margin-top:-35px;"></div>
     </div>
-    <div id="xAxisTitle" style="text-align:center; margin-top: 10px;"></div>
+    
 
     <div class="legend">
       <strong>Legend:</strong>
@@ -70,6 +71,9 @@
       'How important are the environment and ecological benefits of the solution?'
     ];
 
+    const image = new Image(600, 600);
+    image.src = "./canvas_image.png";
+
     const questionContainer = document.getElementById('questions');
 
     questions.forEach((q, i) => {
@@ -93,10 +97,10 @@
 
     function validatePage1() {
       const allAnswered = Array.from(document.querySelectorAll('.question-group')).every(group => group.querySelector('.selected'));
-      // if (!allAnswered) {
-      //   alert('Please answer all questions before proceeding.');
-      //   return;
-      // }
+      if (!allAnswered) {
+        alert('Please answer all questions before proceeding.');
+        return;
+      }
       nextPage(1);
     }
 
@@ -122,9 +126,11 @@
       document.getElementById('xAxisTitle').innerText = topTwo[0];
       document.getElementById('yAxisTitle').innerText = topTwo[1];
 
+
+
       const canvas = document.getElementById('xyCanvas');
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(image, 0, 0);
 
       const solutions = [
         '1', '2', '3', '4', '5', '6'
@@ -156,6 +162,8 @@
           ctx.textBaseline = 'middle';
           ctx.fillText(label, pos.x, pos.y);
         });
+        
+        ctx.drawImage(image, 0, 0);
       }
 
       canvas.onmousedown = (e) => {
@@ -173,7 +181,9 @@
         drawPoints();
       };
 
-      canvas.onmouseup = () => dragTarget = null;
+      canvas.onmouseup = () => {
+        dragTarget = null;
+      }
     }
 
     function submitSurvey() {
@@ -187,8 +197,9 @@
       const imgData = canvas.toDataURL();
 
       const body = `Answers:%0D%0A${answers.join('%0D%0A')}%0D%0A%0D%0AAspects:%0D%0A${aspects}%0D%0AGraph Screenshot (manual): ${imgData}`;
-      window.location.href = `mailto:youremail@example.com?subject=Hull Maintenance Survey&body=${body}`;
+      window.location.href = `mailto:afridi_101@live.com?subject=Hull Maintenance Survey&body=${body}`;
     }
+
   </script>
 </body>
 </html>
