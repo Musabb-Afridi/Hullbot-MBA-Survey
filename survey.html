@@ -15,6 +15,8 @@
     textarea { width: 100%; height: 150px; }
     canvas { border: 1px solid black; margin-top: 10px; }
     .number { position: absolute; width: 24px; height: 24px; text-align: center; line-height: 24px; background: #007bff; color: white; border-radius: 50%; cursor: move; }
+    .y-axis-label { transform: rotate(-90deg); transform-origin: left top 0; position: absolute; left: 10px; top: 300px; }
+    .legend { margin-top: 20px; }
   </style>
 </head>
 <body>
@@ -29,13 +31,30 @@
     <h2>Please list the aspects that matter to you the most when considering a hull maintenance solution.</h2>
     <div>Please list each aspect on a new line in order of importance (starting with most important)</div>
     <textarea id="aspects"></textarea>
-    <button onclick="nextPage(2)">Next</button>
+    <button onclick="validatePage2()">Next</button>
   </div>
 
   <div class="page" id="page3">
     <h2>Place each solution on the graph</h2>
     <p>Axes will be: <span id="axisLabels"></span></p>
-    <canvas id="xyCanvas" width="600" height="600"></canvas>
+    <div style="position: relative; display: inline-block;">
+      <div class="y-axis-label" id="yAxisTitle"></div>
+      <canvas id="xyCanvas" width="600" height="600"></canvas>
+    </div>
+    <div id="xAxisTitle" style="text-align:center; margin-top: 10px;"></div>
+
+    <div class="legend">
+      <strong>Legend:</strong>
+      <ul>
+        <li>1) Hullbot proactive robot cleaning solution</li>
+        <li>2) Preventative cleaning with divers</li>
+        <li>3) Antifoul coating only</li>
+        <li>4) Business as usual</li>
+        <li>5) Other reactive cleaning robot solutions</li>
+        <li>6) Other proactive cleaning robot solutions</li>
+      </ul>
+    </div>
+
     <button onclick="submitSurvey()">Submit</button>
   </div>
 
@@ -81,6 +100,15 @@
       nextPage(1);
     }
 
+    function validatePage2() {
+      const aspects = document.getElementById('aspects').value.split('\n').map(x => x.trim()).filter(x => x);
+      if (aspects.length < 2) {
+        alert('Please list at least 2 aspects.');
+        return;
+      }
+      nextPage(2);
+    }
+
     function nextPage(current) {
       document.getElementById(`page${current}`).classList.remove('active');
       document.getElementById(`page${current + 1}`).classList.add('active');
@@ -91,6 +119,8 @@
       const aspects = document.getElementById('aspects').value.split('\n').map(x => x.trim()).filter(x => x);
       const topTwo = aspects.slice(0, 2);
       document.getElementById('axisLabels').innerText = `${topTwo[0]} (X) vs ${topTwo[1]} (Y)`;
+      document.getElementById('xAxisTitle').innerText = topTwo[0];
+      document.getElementById('yAxisTitle').innerText = topTwo[1];
 
       const canvas = document.getElementById('xyCanvas');
       const ctx = canvas.getContext('2d');
