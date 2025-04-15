@@ -2,224 +2,266 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hull Maintenance Survey</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .page { display: none; }
-    .active { display: block; }
-    .question-group { margin-bottom: 20px; }
-    .rating { display: flex; gap: 10px; }
-    .rating label { cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; }
-    .selected { background-color: #007bff; color: white; }
-    textarea { width: 100%; height: 150px; }
-    canvas { border: 1px solid black; margin-top: 10px; display: block; }
-    .legend { margin-top: 20px; }
-    .axis-label-x {
-      text-align: center; margin-top: -35px; font-weight: bold;
-    }
-    .axis-label-y {
-      position: absolute; transform: rotate(-90deg);
-      transform-origin: left top 0; left: 25px; top: 280px;
-      font-weight: bold;
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-</head>
-<body onload="emailjs.init('tkFv2CBCElWz9rv5c')">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hull Maintenance Survey</title>
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; }
+            .page { display: none; }
+            .active { display: block; }
+            .question-group { margin-bottom: 20px; }
+            .rating { display: flex; gap: 10px; }
+            .rating label { cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; }
+            .selected { background-color: #007bff; color: white; }
+            textarea { width: 100%; height: 150px; }
+            canvas { border: 1px solid black; margin-top: 10px; display: block; }
+            .legend { margin-top: 20px; }
+            .axis-label-x {
+                text-align: center; margin-top: -35px; font-weight: bold;
+            }
+            .axis-label-y {
+                position: absolute; transform: rotate(-90deg);
+                transform-origin: left top 0; left: 25px; top: 280px;
+                font-weight: bold;
+            }
+        </style>
+        <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    </head>
+    <body onload="emailjs.init('tkFv2CBCElWz9rv5c')">
 
-<div class="page active" id="page1">
-  <h2>When considering a Hull maintenance solution:</h2>
-  <div id="questions"></div>
-  <button onclick="validatePage1()">Next</button>
-</div>
+        <div class="page active" id="page0">
+            <h2>Tell us about yourself</h2>
+            <label>Name:<br/><input type="text" id="userName" /></label><br/><br/>
+            <label><strong>Company (required):</strong><br/><input type="text" id="userCompany" required /></label><br/><br/>
+            <label>Comments:<br/><textarea id="userComments" rows="4" style="width:100%;"></textarea></label><br/><br/>
+            <button onclick="validatePage0()">Next</button>
+        </div>
+        <textarea id="aspects" style="display:none;"></textarea>
 
-<div class="page" id="page2">
-  <h2>Please list the aspects that matter to you the most when considering a hull maintenance solution.</h2>
-  <div>Please list each aspect on a new line in order of importance (starting with most important)</div>
-  <textarea id="aspects"></textarea>
-  <button onclick="validatePage2()">Next</button>
-</div>
+        <div class="page" id="page1">
+            <h2>When considering a Hull maintenance solution:</h2>
+            <div id="questions"></div>
+            <button onclick="validatePage1()">Next</button>
+        </div>
 
-<div class="page" id="page3">
-  <h2 style="margin-bottom: 5px;">Place each solution on the graph</h2>
-  <div style="margin-top: 5px;font-size: 12px;">Click where appropriate. Answers can be moved after placing all 6</div>
-  <p>Axes will be: <span id="axisLabels"></span></p>
-  <div style="position: relative; display: inline-block;">
-    <div class="axis-label-y" id="yLabel"></div>
-    <canvas id="xyCanvas" width="600" height="600"></canvas>
-    <div class="axis-label-x" id="xLabel"></div>
-  </div>
-  <div class="legend">
-    <strong>Legend:</strong><br/>
-    1 - Hullbot proactive robot cleaning solution<br/>
-    2 - Preventative cleaning with divers<br/>
-    3 - Antifoul coating only<br/>
-    4 - Business as usual<br/>
-    5 - Other reactive cleaning robot solutions<br/>
-    6 - Other proactive cleaning robot solutions
-  </div>
-  <button onclick="submitSurvey()">Submit</button>
-</div>
+        <div class="page" id="page2">
+            <h2>Please list the aspects that matter to you the most when considering a hull maintenance solution in general.</h2>
+            <div id="aspectsContainer">
+                <input type="text" class="aspect-line" placeholder="Aspect 1"><br/>
+                <input type="text" class="aspect-line" placeholder="Aspect 2"><br/>
+            </div>
+            <button onclick="addAspectLine()">+ Add another aspect</button><br/><br/>
+            <button onclick="validatePage2()">Next</button>
+        </div>
+          
 
-<div class="page" id="page4">
-  <h2>Thank You!</h2>
-  <p>Your responses have been submitted successfully.</p>
-</div>
+        <div class="page" id="page3">
+            <h2 style="margin-bottom: 5px;">Place each solution on the graph</h2>
+            <div style="margin-top: 5px;font-size: 12px;">Click where appropriate. Answers can be moved after placing all 6</div>
+            <p>Axes will be: <span id="axisLabels"></span></p>
+            <div style="position: relative; display: inline-block;">
+                <div class="axis-label-y" id="yLabel"></div>
+                <canvas id="xyCanvas" width="600" height="600"></canvas>
+                <div class="axis-label-x" id="xLabel"></div>
+            </div>
+            <div class="legend">
+                <strong>Legend:</strong><br/>
+                1 - Hullbot proactive robot cleaning solution<br/>
+                2 - Preventative cleaning with divers<br/>
+                3 - Antifoul coating only<br/>
+                4 - Business as usual<br/>
+                5 - Other reactive cleaning robot solutions<br/>
+                6 - Other proactive cleaning robot solutions
+            </div>
+            <button onclick="submitSurvey()">Submit</button>
+        </div>
 
-<script>
-  const questions = [
-    'How important is operational cost as a factor?',
-    'How important is on-going reliability of solution/service?',
-    'How important is its impact on unexpected downtime?',
-    'How important is global significance of solution?',
-    'How important is future proofing of the solution?',
-    'How important is the solution providers mission?',
-    'How important is the carbon sequestration impact of the solution?',
-    'How important are the environment and ecological benefits of the solution?'
-  ];
+        <div class="page" id="page4">
+            <h2>Thank You!</h2>
+            <p>Your responses have been submitted successfully.</p>
+        </div>
 
-  const image = new Image(600, 600);
-  image.src = "./canvas_image.png";
+        <script>
+            const questions = [
+                'How important is operational cost as a factor?',
+                'How important is on-going reliability of solution/service?',
+                'How important is its impact on unexpected downtime?',
+                'How important is global significance of solution?',
+                'How important is future proofing of the solution?',
+                'How important is the solution providers mission?',
+                'How important is the carbon sequestration impact of the solution?',
+                'How important are the environment and ecological benefits of the solution?'
+            ];
 
-  const questionContainer = document.getElementById('questions');
+            const image = new Image(600, 600);
+            image.src = "./canvas_image.png";
 
-  questions.forEach((q, i) => {
-    const group = document.createElement('div');
-    group.className = 'question-group';
-    group.innerHTML = `<p>${q}</p>`;
-    const ratingDiv = document.createElement('div');
-    ratingDiv.className = 'rating';
-    for (let j = 0; j <= 5; j++) {
-      const label = document.createElement('label');
-      label.innerText = j;
-      label.onclick = () => {
-        Array.from(ratingDiv.children).forEach(c => c.classList.remove('selected'));
-        label.classList.add('selected');
-      };
-      ratingDiv.appendChild(label);
-    }
-    group.appendChild(ratingDiv);
-    questionContainer.appendChild(group);
-  });
+            const questionContainer = document.getElementById('questions');
 
-  function validatePage1() {
-    const allAnswered = Array.from(document.querySelectorAll('.question-group')).every(group => group.querySelector('.selected'));
-    if (!allAnswered) {
-      alert('Please answer all questions before proceeding.');
-      return;
-    }
-    nextPage(1);
-  }
+            questions.forEach((q, i) => {
+                const group = document.createElement('div');
+                group.className = 'question-group';
+                group.innerHTML = `<p>${q}</p>`;
+                const ratingDiv = document.createElement('div');
+                ratingDiv.className = 'rating';
+                for (let j = 0; j <= 5; j++) {
+                    const label = document.createElement('label');
+                    label.innerText = j;
+                    label.onclick = () => {
+                        Array.from(ratingDiv.children).forEach(c => c.classList.remove('selected'));
+                        label.classList.add('selected');
+                    };
+                    ratingDiv.appendChild(label);
+                }
+                group.appendChild(ratingDiv);
+                questionContainer.appendChild(group);
+            });
 
-  function validatePage2() {
-    const lines = document.getElementById('aspects').value.trim().split('\n').filter(line => line.trim() !== '');
-    if (lines.length < 2) {
-      alert('Please enter at least two aspects.');
-      return;
-    }
-    nextPage(2);
-  }
+            function validatePage0() {
+                const company = document.getElementById('userCompany').value.trim();
+                if (company === '') {
+                    alert('Please enter your company before proceeding.');
+                    return;
+                }
+                nextPage(0);
+            }
 
-  function nextPage(current) {
-    document.getElementById(`page${current}`).classList.remove('active');
-    document.getElementById(`page${current + 1}`).classList.add('active');
-    if (current === 2) setUpGraph();
-  }
+            function validatePage1() {
+                const allAnswered = Array.from(document.querySelectorAll('.question-group')).every(group => group.querySelector('.selected'));
+                if (!allAnswered) {
+                    alert('Please answer all questions before proceeding.');
+                    return;
+                }
+                nextPage(1);
+            }
 
-  let placed = {};
+            function validatePage2() {
+                const inputs = Array.from(document.querySelectorAll('.aspect-line')).map(i => i.value.trim()).filter(v => v !== '');
+                if (inputs.length < 2) {
+                    alert('Please enter at least two aspects.');
+                    return;
+                }
+                document.getElementById('aspects').value = inputs.join('\n'); // hidden field for compatibility
+                nextPage(2);
+            }
 
-  function setUpGraph() {
-    placed = {};
-    const canvas = document.getElementById('xyCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0);
+            function nextPage(current) {
+                document.getElementById(`page${current}`).classList.remove('active');
+                document.getElementById(`page${current + 1}`).classList.add('active');
+                if (current === 2) setUpGraph();
+            }
 
-    const aspects = document.getElementById('aspects').value.split('\n').map(x => x.trim()).filter(x => x);
-    const topTwo = aspects.slice(0, 2);
-    document.getElementById('axisLabels').innerText = `${topTwo[0]} (X) vs ${topTwo[1]} (Y)`;
-    document.getElementById('xLabel').innerText = topTwo[0];
-    document.getElementById('yLabel').innerText = topTwo[1];
+            let placed = {};
 
-    const solutions = ['1', '2', '3', '4', '5', '6'];
-    let dragTarget = null;
+            function addAspectLine() {
+                const container = document.getElementById('aspectsContainer');
+                const count = container.querySelectorAll('.aspect-line').length + 1;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = `Aspect ${count}`;
+                input.className = 'aspect-line';
+                container.appendChild(input);
+                container.appendChild(document.createElement('br'));
+            }
 
-    function drawPoints() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      Object.entries(placed).forEach(([label, pos]) => {
-        ctx.beginPath();
-        ctx.arc(pos.x, pos.y, 12, 0, 2 * Math.PI);
-        ctx.fillStyle = '#007bff';
-        ctx.fill();
-        ctx.fillStyle = 'white';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(label, pos.x, pos.y);
-      });
+            function setUpGraph() {
+                placed = {};
+                const canvas = document.getElementById('xyCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(image, 0, 0);
 
-      
-      ctx.drawImage(image, 0, 0);
-    }
+                const aspects = document.getElementById('aspects').value.split('\n').map(x => x.trim()).filter(x => x);
+                const topTwo = aspects.slice(0, 2);
+                document.getElementById('axisLabels').innerText = `${topTwo[0]} (X) vs ${topTwo[1]} (Y)`;
+                document.getElementById('xLabel').innerText = topTwo[0];
+                document.getElementById('yLabel').innerText = topTwo[1];
 
-    canvas.onclick = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const next = solutions.find(s => !placed[s]);
-      if (next) {
-        placed[next] = { x, y };
-        drawPoints();
-      }
-    };
+                const solutions = ['1', '2', '3', '4', '5', '6'];
+                let dragTarget = null;
 
-    canvas.onmousedown = (e) => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      dragTarget = Object.entries(placed).find(([_, pos]) => Math.hypot(pos.x - x, pos.y - y) < 12);
-    };
+                function drawPoints() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    Object.entries(placed).forEach(([label, pos]) => {
+                        ctx.beginPath();
+                        ctx.arc(pos.x, pos.y, 12, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#007bff';
+                        ctx.fill();
+                        ctx.fillStyle = 'white';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText(label, pos.x, pos.y);
+                    });
 
-    canvas.onmousemove = (e) => {
-      if (!dragTarget) return;
-      const rect = canvas.getBoundingClientRect();
-      dragTarget[1].x = e.clientX - rect.left;
-      dragTarget[1].y = e.clientY - rect.top;
-      drawPoints();
-    };
+                    
+                    ctx.drawImage(image, 0, 0);
+                }
 
-    canvas.onmouseup = () => dragTarget = null;
-  }
+                canvas.onclick = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const next = solutions.find(s => !placed[s]);
+                    if (next) {
+                        placed[next] = { x, y };
+                        drawPoints();
+                    }
+                };
 
-  function submitSurvey() {
-    if (Object.keys(placed).length < 6) {
-      alert("Please place all 6 solutions on the graph before submitting.");
-      return;
-    }
+                canvas.onmousedown = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    dragTarget = Object.entries(placed).find(([_, pos]) => Math.hypot(pos.x - x, pos.y - y) < 12);
+                };
 
-    const answers = Array.from(document.querySelectorAll('.question-group')).map((group, i) => {
-      const selected = group.querySelector('.selected');
-      return `${questions[i]}: ${selected ? selected.innerText : 'N/A'}`;
-    });
+                canvas.onmousemove = (e) => {
+                    if (!dragTarget) return;
+                    const rect = canvas.getBoundingClientRect();
+                    dragTarget[1].x = e.clientX - rect.left;
+                    dragTarget[1].y = e.clientY - rect.top;
+                    drawPoints();
+                };
 
-    const aspects = document.getElementById('aspects').value;
+                canvas.onmouseup = () => dragTarget = null;
+            }
 
-    let coordinatesText = '';
-    for (const [label, pos] of Object.entries(placed)) {
-      coordinatesText += `Solution ${label}: x=${Math.round(pos.x)}, y=${Math.round(pos.y)}\n`;
-    }
+            function submitSurvey() {
+                const name = document.getElementById('userName').value.trim();
+                const company = document.getElementById('userCompany').value.trim();
+                const comments = document.getElementById('userComments').value.trim();
 
-    emailjs.send('hullbot_marketing', 'template_cbzrg1q', {
-      answers: answers.join('\n'),
-      aspects: aspects,
-      coords: coordinatesText
-    }).then(() => {
-      nextPage(3); // to page 4
-    }, (error) => {
-      alert('Failed to send. Please try again.\n' + JSON.stringify(error));
-    });
-  }
-</script>
-</body>
+
+                if (Object.keys(placed).length < 6) {
+                    alert("Please place all 6 solutions on the graph before submitting.");
+                    return;
+                }
+
+                const answers = Array.from(document.querySelectorAll('.question-group')).map((group, i) => {
+                    const selected = group.querySelector('.selected');
+                    return `${questions[i]}: ${selected ? selected.innerText : 'N/A'}`;
+                });
+
+                const aspects = document.getElementById('aspects').value;
+
+                let coordinatesText = '';
+                for (const [label, pos] of Object.entries(placed)) {
+                    coordinatesText += `Solution ${label}: x=${Math.round(pos.x)}, y=${Math.round(pos.y)}\n`;
+                }
+
+                emailjs.send('hullbot_marketing', 'template_cbzrg1q', {
+                    name: name,
+                    company: company,
+                    comments: comments,
+                    answers: answers.join('\n'),
+                    aspects: aspects,
+                    coords: coordinatesText
+                }).then(() => {
+                    nextPage(3); // to page 4
+                }, (error) => {
+                    alert('Failed to send. Please try again.\n' + JSON.stringify(error));
+                });
+            }
+        </script>
+    </body>
 </html>
