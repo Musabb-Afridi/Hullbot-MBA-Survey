@@ -34,7 +34,6 @@
             <h2>Tell us about yourself</h2>
             <label><strong>Company (required):</strong><br/><input type="text" id="userCompany" required /></label><br/><br/>
             <label>Name:<br/><input type="text" id="userName" /></label><br/><br/>
-            <label>Comments:<br/><textarea id="userComments" rows="4" style="width:100%;"></textarea></label><br/><br/>
             <button onclick="validatePage0()">Next</button>
         </div>
         <textarea id="aspects" style="display:none;"></textarea>
@@ -59,7 +58,7 @@
           
 
         <div class="page" id="page3">
-            <h2 style="margin-bottom: 5px;">Place each solution on the graph</h2>
+            <h2 style="margin-bottom: 5px;">Place each solution on the graph and submit below</h2>
             <div style="margin-top: 5px;font-size: 12px;">Click where appropriate. Answers can be moved after placing all 6</div>
             <p>Axes will be: <span id="axisLabels"></span></p>
             <div style="position: relative; display: inline-block;">
@@ -68,7 +67,7 @@
                 <div class="axis-label-x" id="xLabel"></div>
             </div>
             <button onclick="resetGraph()" style="margin-top: 10px;">Reset Graph</button>
-            <div class="legend">
+            <div style="padding-top: 10px;" class="legend">
                 <strong>Legend:</strong><br/>
                 1 - Hullbot proactive grooming with robot systems<br/>
                 2 - Reactive cleaning with divers (e.g. quarterly)<br/>
@@ -77,12 +76,21 @@
                 5 - Other reactive cleaning robot solutions<br/>
                 6 - Other proactive cleaning robot solutions (more than quarterly)
             </div>
-            <button onclick="submitSurvey()">Submit</button>
+            <div style="padding-top: 20px;"></div>
+            <label>Optional comments:<br/><textarea id="userComments" rows="4" style="width:100%;"></textarea></label><br/><br/>
+            <button style="height: 40px;width: 150px;font-size: 20px;" onclick="submitSurvey()">Submit</button>
         </div>
 
         <div class="page" id="page4">
             <h2>Thank You!</h2>
             <p>Your responses have been submitted successfully.</p>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <div style="display: inline;"><label style="font-weight: bold;">Purpose: </label> University Project</div>
+            <div>All answers will be kept private</div>
+            <div>Anonimised answers will be submitted as part of a university assignment</div>
+            <div>Opinions do not represent the company</div>
         </div>
 
         <script>
